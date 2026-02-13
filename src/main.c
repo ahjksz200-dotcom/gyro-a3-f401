@@ -1,37 +1,31 @@
 #include "stm32f4xx.h"
-#include "pwm_in.h"
-#include "pwm_out.h"
 #include "spi.h"
 #include "mpu6500.h"
-#include "pid.h"
 
-volatile float angle_roll = 0;
-
-void delay(volatile uint32_t t)
-{
-    while(t--);
-}
+void GPIO_Init(void);
+void delay(volatile uint32_t time);
 
 int main(void)
 {
     SystemInit();
 
-    PWM_IN_Init();
-    PWM_OUT_Init();
+    GPIO_Init();
     SPI1_Init();
     MPU6500_Init();
-    PID_Init();
 
+    // Test WHO_AM_I
+    uint8_t id = MPU6500_ReadReg(0x75);
+
+    // Nếu đúng MPU6500 thì id = 0x70
     while (1)
     {
-        MPU6500_Read();
+        MPU6500_ReadGyro();
 
-        float rc_roll = PWM_IN_Get(0); // channel 1
+        // breakpoint tại đây để xem:
+        // gyro_x
+        // gyro_y
+        // gyro_z
 
-        float correction = PID_Update(rc_roll, angle_roll);
-
-        PWM_OUT_Set(0, 1500 + correction);
-
-        delay(5000);
+        delay(50000);
     }
 }
