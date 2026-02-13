@@ -3,14 +3,14 @@
 
 void GPIO_Init(void)
 {
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+    // Enable clock GPIOC
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
 
-    GPIOA->MODER &= ~(3 << (4 * 2));
-    GPIOA->MODER |=  (1 << (4 * 2));
+    // PC13 output
+    GPIOC->MODER &= ~(3 << (13 * 2));
+    GPIOC->MODER |=  (1 << (13 * 2));   // output mode
 
-    GPIOA->OTYPER &= ~(1 << 4);
-    GPIOA->OSPEEDR |= (3 << (4 * 2));
-    GPIOA->PUPDR &= ~(3 << (4 * 2));
-
-    GPIOA->BSRR = (1 << 4);
+    GPIOC->OTYPER &= ~(1 << 13);        // push pull
+    GPIOC->OSPEEDR |= (3 << (13 * 2));  // high speed
+    GPIOC->PUPDR &= ~(3 << (13 * 2));   // no pull
 }
