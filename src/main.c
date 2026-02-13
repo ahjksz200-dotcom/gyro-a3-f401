@@ -10,14 +10,39 @@ int main(void)
 {
     SystemInit();
 
-    GPIO_Init();
-    SPI1_Init();
-    MPU6500_Init();
+    // Enable clock GPIOC cho LED PC13
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
 
-    uint8_t id = MPU6500_ReadReg(0x75);
+    // PC13 output
+    GPIOC->MODER &= ~(3 << (13 * 2));
+    GPIOC->MODER |=  (1 << (13 * 2));
 
-while (1)
-{
-    GPIOC->ODR ^= (1 << 13);   // toggle PC13
-    delay(2000000);
+    GPIOC->OTYPER &= ~(1 << 13);
+    GPIOC->OSPEEDR |= (3 << (13 * 2));
+    GPIOC->PUPDR &= ~(3 << (13 * 2));
+
+    // LED OFF ban đầu (PC13 active LOW)
+    GPIOC->ODR |= (1 << 13);
+
+    GPIO_Init();        // CS pin (PA4)
+    SPI1_Init();        // SPI1
+    MPU6500_Init();     // Init MPU
+
+    while (1)
+    {
+        uint8_t id = MPU6500_ReadReg(0x75);
+
+        if (id == 0x70)
+        {
+            // LED ON (SPI OK)
+            GPIOC->ODR &= ~(1 << 13);
+        }
+        else
+        {
+            // LED OFF (SPI lỗi)
+            GPIOC->ODR |= (1 << 13);
+        }
+
+        delay(2000000);
+    }
 }
