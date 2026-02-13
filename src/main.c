@@ -16,9 +16,8 @@ int main(void)
 
     uint8_t id = MPU6500_ReadReg(0x75);
 
-    while (1)
-    {
-        MPU6500_ReadGyro();
-        delay(50000);
-    }
+while (1)
+{
+    GPIOC->ODR ^= (1 << 13);   // toggle PC13
+    delay(2000000);
 }
